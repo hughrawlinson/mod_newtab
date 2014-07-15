@@ -1,5 +1,67 @@
 <html>
-  <body style="background-color: black; color: white;">
-    Foo Bar!
-  </body>
+<head>
+    <title>Hugh tab</title>
+    <script charset="utf-8" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.10/d3.min.js"></script>
+    <style media="screen">
+    body{
+        margin: 0;
+        background: #000;
+    }
+
+    path {
+        fill: transparent;
+        stroke: #0F0;
+    }
+
+    circle {
+        fill: #000;
+        stroke: #000;
+        pointer-events: none;
+    }
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+window.requestAnimFrame = (function(){
+    return  window.requestAnimationFrame       ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame    ||
+    function( callback ){
+        window.setTimeout(callback, 1000 / 60);
+    };
+})();
+
+var width = innerWidth - 4,
+height = innerHeight - 4;
+
+var vertices = d3.range(50).map(function(d) {
+    return [Math.random() * width, Math.random() * height];
+});
+var speeds = d3.range(50).map(function(d) {
+    var speed = Math.random();
+    return [(speed - 0.5) *0.5, ((1 - speed) - 0.5) *0.5];
+});
+
+var svg = d3.select("body").append("svg")
+.attr("width", width)
+.attr("height", height);
+
+var path = svg.append("g").selectAll("path");
+
+redraw();
+
+function redraw() {
+    requestAnimFrame(redraw);
+    for(var x=4; x < vertices.length; x++){
+        vertices[x][0] += speeds[x][0];
+        vertices[x][1] += speeds[x][1];
+        if(vertices[x][0] > width || vertices[x][0] < 0) speeds[x][0] = -1 * speeds[x][0];
+        if(vertices[x][1] > height || vertices[x][1] < 0) speeds[x][1] = -1 * speeds[x][1];
+    }
+    path = path.data(d3.geom.delaunay(vertices).map(function(d) { return "M" + d.join("L") + "Z"; }), String);
+    path.exit().remove();
+    path.enter().append("path").attr("d", String);
+}
+</script>
+</body>
 </html>
